@@ -5,9 +5,7 @@ import plotly.graph_objs as go
 import pandas as pd
 
 # Import your dataframe from a csv with pandas
-df = pd.read_csv(
-    'https://raw.githubusercontent.com/plotly/'
-    'datasets/master/gapminderDataFiveYear.csv')
+df = pd.read_csv('brainheadclean.csv')
 
 # Create a Dash object instance
 app = dash.Dash()
@@ -21,12 +19,12 @@ app = dash.Dash()
 app.layout = html.Div([
     dcc.Graph(id='graph-with-slider'),
     dcc.Slider(
-        id='year-slider',
-        min=df['year'].min(),
-        max=df['year'].max(),
-        value=df['year'].min(),  # The default value of the slider.
+        id='age-slider',
+        min=df['age'].min(),
+        max=df['age'].max(),
+        value=df['age'].min(),  # The default value of the slider.
         step=None,
-        marks={str(year): str(year) for year in df['year'].unique()}
+        marks={str(age): str(age) for age in df['age'].unique()}
     )
 ])
 
@@ -35,13 +33,13 @@ app.layout = html.Div([
 # the ids of the components in app.layout above.
 @app.callback(
     dash.dependencies.Output('graph-with-slider', 'figure'),
-    [dash.dependencies.Input('year-slider', 'value')])
-def update_figure(selected_year):
+    [dash.dependencies.Input('age-slider', 'value')])
+def update_figure(selected_age):
     """Define how the graph is to be updated based on the slider."""
 
     # Depending on the year selected on the slider, filter the db
     # by that year.
-    filtered_df = df[df.year == selected_year]
+    filtered_df = df[df.age == selected_age]
 
     # The go.Scatter graph object go.Scatter contains information
     # about points to put on a scatter plot. Here, we create one
@@ -49,15 +47,15 @@ def update_figure(selected_year):
     # Scatter object to a list. The whole list of Scatterplots will
     # appear on one graph--'graph-with-slider'
     traces = []
-    for i in filtered_df.continent.unique():
-        df_by_continent = filtered_df[filtered_df['continent'] == i]
+    for i in filtered_df.gender.unique():
+        df_by_gender = filtered_df[filtered_df['gender'] == i]
         """The mode controls the appearance of the points of data. Try changing
         mode below to 'lines' and see the change. A complete list of modes is
         available at https://plot.ly/python/reference/#scatter"""
         traces.append(go.Scatter(  # Scatter is just one plotly.graph_obj (.go)
-            x=df_by_continent['gdpPercap'],   # graph type. Try changing
-            y=df_by_continent['lifeExp'],     # to go.Scatter3d.
-            text=df_by_continent['country'],  # (It won't look great, here.)
+            x=df_by_gender['headsize'],   # graph type. Try changing
+            y=df_by_gender['brainwgt'],     # to go.Scatter3d.
+            text=df_by_gender['gender'],  # (It won't look great, here.)
             mode='markers',
             opacity=0.7,
             marker={
@@ -70,8 +68,8 @@ def update_figure(selected_year):
     return {
         'data': traces,
         'layout': go.Layout(
-            xaxis={'type': 'log', 'title': 'GDP Per Capita'},
-            yaxis={'title': 'Life Expectancy', 'range': [20, 90]},
+            xaxis={'type': 'log', 'title': 'headsize'},
+            yaxis={'title': 'brainwgt', 'range': [900, 1700]},
             margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
             legend={'x': 0, 'y': 1},
             hovermode='closest'  # Try commenting out this line and seeing what
